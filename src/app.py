@@ -89,7 +89,7 @@ def get_individual_user(user_id):
     return jsonify(resultado.serialize()), 200 
 
 @app.route('/favorite/planet/<int:planet_uid>', methods=['POST'])
-def post_individual(planet_uid):
+def post_individual_planet(planet_uid):
  
     body= json.loads(request.data)
     new_favortie = FavoritePlanet(
@@ -99,6 +99,40 @@ def post_individual(planet_uid):
     db.session.add(new_favortie)
     db.session.commit()
     return jsonify({"MSG":" Planeta favorito creado "}), 200
+
+@app.route('/favorite/character/<int:character_uid>', methods=['POST'])
+def post_individual_character(character_uid):
+ 
+    body= json.loads(request.data)
+    new_character = FavoriteCharacter(
+        user_id= body["user_id"],
+        character_id = character_uid  
+    )
+    db.session.add(new_character)
+    db.session.commit()
+    return jsonify({"MSG":" character favorito creado "}), 200
+
+@app.route('/favorite/planet/<int:planet_id>', methods=['DELETE'])
+def delete_individual_planet(planet_id):
+
+    user_id = request.args.get("user_id")
+    favorite_delete_planet= FavoritePlanet.query.filter_by(user_id = user_id, planet_id = planet_id).first()
+    if favorite_delete_planet: 
+        db.session.delete(favorite_delete_planet)
+        db.session.commit()
+        return jsonify({"MSG":" Planeta favorito eliminado "}), 200
+    return jsonify({"MSG":" Planeta favorito no eliminado "}), 400
+
+@app.route('/favorite/character/<int:character_id>', methods=['DELETE'])
+def delete_individual_character(character_id):
+
+    user_id = request.args.get("user_id")
+    favorite_delete_character= FavoriteCharacter.query.filter_by(user_id = user_id, character_id = character_id).first()
+    if favorite_delete_character: 
+        db.session.delete(favorite_delete_character)
+        db.session.commit()
+        return jsonify({"MSG":" Character favorito eliminado "}), 200
+    return jsonify({"MSG":" Character favorito no eliminado "}), 400
 
 
 # this only runs if `$ python src/app.py` is executed
